@@ -1,9 +1,11 @@
 "use client";
+import { interviewer } from "@/constants";
 import { cn } from "@/lib/utils";
 import { vapi } from "@/lib/vapi.sdk";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -17,7 +19,13 @@ interface SavedMessage {
   content: string;
 }
 
-const Agent = ({ userName, userId, type }: AgentProps) => {
+const Agent = ({
+  userName,
+  userId,
+  type,
+  interviewId,
+  questions,
+}: AgentProps) => {
   const router = useRouter();
   console.log(userName, userId, type);
 
@@ -88,7 +96,11 @@ const Agent = ({ userName, userId, type }: AgentProps) => {
 
   useEffect(() => {
     if (callStatus === CallStatus.FINISHED) {
-      router.push("/interview");
+      if (type === "generate") {
+        router.push("/");
+      } else {
+        handleGenerateFeedback(messages);
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [callStatus]);
@@ -96,19 +108,50 @@ const Agent = ({ userName, userId, type }: AgentProps) => {
   const handleCall = async () => {
     setCallStatus(CallStatus.CONNECTING);
 
-    // start the conversation with this (NEXT_PUBLIC_VAPI_WORKFLOW_ID) specific ai agent
-    await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
-      variableValues: {
-        username: userName,
-        userid: userId,
-      },
-    });
+    if (type === "generate") {
+      // start the conversation with this (NEXT_PUBLIC_VAPI_WORKFLOW_ID) specific ai agent
+      await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
+        variableValues: {
+          username: userName,
+          userid: userId,
+        },
+      });
+    } else {
+      let formattedQuestions = "";
+
+      if (questions) {
+        formattedQuestions = questions
+          ?.map((question) => `- ${question}`)
+          ?.join("\n");
+      }
+
+      await vapi.start(interviewer, {
+        variableValues: {
+          questions: formattedQuestions,
+        },
+      });
+    }
   };
 
   const handleDisconnect = async () => {
     setCallStatus(CallStatus.FINISHED);
 
     vapi.stop(); // stop the conversation
+  };
+
+  const handleGenerateFeedback = async (messages: SavedMessage[]) => {
+    console.log("Generate Feedback Here");
+
+    // TODO: create a server action to generate feedback
+    const [success, id] = { success: true, id: "sdfdsds2435r3ewbsir3t" };
+
+    if (success && id) {
+      router.push(`/interview/${interviewId}/feedback`);
+    } else {
+      console.log("Error saving feedback");
+      toast.error("Error saving feedback");
+      router.push("/");
+    }
   };
 
   return (
