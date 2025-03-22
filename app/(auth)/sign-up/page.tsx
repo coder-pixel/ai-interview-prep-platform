@@ -4,7 +4,7 @@ import React from "react";
 const SignUp = () => {
   return (
     <div>
-      <AuthForm type="sign-up" />/
+      <AuthForm type="sign-up" />
     </div>
   );
 };

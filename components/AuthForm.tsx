@@ -9,6 +9,9 @@ import { Button } from "./ui/button";
 import Image from "next/image";
 import { useMemo } from "react";
 import Link from "next/link";
+import { toast } from "sonner";
+import FormField from "./FormField";
+import { useRouter } from "next/navigation";
 
 const AuthFormSchema = (type: FormType) => {
   return z.object({
@@ -20,6 +23,7 @@ const AuthFormSchema = (type: FormType) => {
 
 const AuthForm = ({ type }: { type: FormType }) => {
   console.log({ type });
+  const router = useRouter();
 
   const formSchema = useMemo(() => AuthFormSchema(type), [type]);
 
@@ -27,15 +31,30 @@ const AuthForm = ({ type }: { type: FormType }) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
+      name: "",
+      email: "",
+      password: "",
     },
   });
 
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     console.log(values);
+
+    try {
+      if (type === "sign-up") {
+        console.log("sign-up", { values });
+        toast.success("Account created successfully. Please Sign In");
+        router.push("/sign-in");
+      } else {
+        console.log("sign-in", { values });
+        toast.success("Signed in successfully");
+        router.push("/");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error as string);
+    }
   }
 
   const isSignIn = useMemo(() => type === "sign-in", [type]);
@@ -55,7 +74,31 @@ const AuthForm = ({ type }: { type: FormType }) => {
             onSubmit={form.handleSubmit(onSubmit)}
             className="w-full space-y-6 mt-4 form"
           >
-            {!isSignIn ? <p>name</p> : null}
+            {!isSignIn ? (
+              <FormField
+                control={form.control}
+                name="name"
+                label="Name"
+                placeholder="Enter your name"
+              />
+            ) : null}
+
+            <FormField
+              control={form.control}
+              name="email"
+              label="Email"
+              placeholder="Enter your email"
+              type="email"
+            />
+
+            <FormField
+              control={form.control}
+              name="password"
+              label="Password"
+              placeholder="Enter your password"
+              type="password"
+            />
+
             <Button className="btn " type="submit">
               {isSignIn ? "Sign In" : "Create An Account"}
             </Button>
