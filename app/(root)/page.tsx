@@ -1,4 +1,6 @@
+import InterviewCard from "@/components/InterviewCard";
 import { Button } from "@/components/ui/button";
+import { dummyInterviews } from "@/constants";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -30,7 +32,11 @@ const Page = () => {
       <section className="flex flex-col gap-6 mt-8">
         <h2>Your Inteviews</h2>
         <div className="interviews-section">
-          <p>You haven&apos;t taken any interviews yet!</p>
+          {dummyInterviews?.map((interview) => (
+            <InterviewCard key={interview?.id} {...interview} />
+          ))}
+
+          {/* <p>You haven&apos;t taken any interviews yet!</p> */}
         </div>{" "}
       </section>
 
@@ -38,7 +44,10 @@ const Page = () => {
         <h2>Take Interviews</h2>
 
         <div className="interviews-section">
-          <p>There are no interviews available</p>
+          {dummyInterviews?.map((interview) => (
+            <InterviewCard key={interview?.id} {...interview} />
+          ))}
+          {/* <p>There are no interviews available</p> */}
         </div>
       </section>
     </>
