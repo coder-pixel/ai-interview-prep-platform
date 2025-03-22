@@ -8,13 +8,13 @@ import DisplayTechIcons from "./DisplayTechIcons";
 
 const InterviewCard = ({
   interviewId,
-  userId,
+  //   userId,
   role,
   type,
   techstack,
   createdAt,
-  finalized,
-}: InterviewCardProps) => {
+}: //   finalized,
+InterviewCardProps) => {
   const feedback = null as Feedback | null;
 
   const normalizedType = /mix/gi?.test(type) ? "Mixed" : type;
@@ -30,7 +30,7 @@ const InterviewCard = ({
     feedback?.createdAt || createdAt || Date.now()
   ).format("MMM D, YYYY");
 
-  const isFinalized = finalized || false;
+  //   const isFinalized = finalized || false;
 
   return (
     <div className="card-border w-[360px] max-sm:w-full min-h-96">
