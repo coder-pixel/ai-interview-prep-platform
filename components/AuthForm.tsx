@@ -12,6 +12,9 @@ import Link from "next/link";
 import { toast } from "sonner";
 import FormField from "./FormField";
 import { useRouter } from "next/navigation";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/firebase/client";
+import { signUp } from "@/lib/actions/auth.action";
 
 const AuthFormSchema = (type: FormType) => {
   return z.object({
@@ -38,12 +41,37 @@ const AuthForm = ({ type }: { type: FormType }) => {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     console.log(values);
 
     try {
       if (type === "sign-up") {
         console.log("sign-up", { values });
+        const { name, email, password } = values;
+
+        // this registers a new user in firebase auth and not in firebase db yet
+        const userCredentials = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+
+        console.log("userCredentials", userCredentials);
+
+        const result = await signUp({
+          uid: userCredentials?.user?.uid,
+          name,
+          email,
+          password,
+        });
+
+        if (!result?.success) {
+          toast.error(result?.message || "Something went wrong");
+          return;
+        }
+
+        console.log("result", result);
+
         toast.success("Account created successfully. Please Sign In");
         router.push("/sign-in");
       } else {
@@ -55,7 +83,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
       console.log(error);
       toast.error(error as string);
     }
-  }
+  };
 
   const isSignIn = useMemo(() => type === "sign-in", [type]);
 
