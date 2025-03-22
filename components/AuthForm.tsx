@@ -12,9 +12,12 @@ import Link from "next/link";
 import { toast } from "sonner";
 import FormField from "./FormField";
 import { useRouter } from "next/navigation";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { auth } from "@/firebase/client";
-import { signUp } from "@/lib/actions/auth.action";
+import { signIn, signUp } from "@/lib/actions/auth.action";
 
 const AuthFormSchema = (type: FormType) => {
   return z.object({
@@ -76,6 +79,25 @@ const AuthForm = ({ type }: { type: FormType }) => {
         router.push("/sign-in");
       } else {
         console.log("sign-in", { values });
+
+        const { email, password } = values;
+
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+
+        const idToken = await userCredential?.user?.getIdToken();
+
+        // if no id returns, throw an error and return
+        if (!idToken) {
+          toast.error("Sign in failed");
+          return;
+        }
+
+        await signIn({ email, idToken });
+
         toast.success("Signed in successfully");
         router.push("/");
       }
@@ -134,7 +156,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
         </Form>
 
         <p className="text-center">
-          {!isSignIn ? "Don't have an account?" : "Already have an account?"}
+          {isSignIn ? "Don't have an account?" : "Already have an account?"}
           <Link
             href={isSignIn ? "/sign-up" : "/sign-in"}
             className="font-bold text-user-primary ml-1 hover:underline hover:opacity-80 hover:font-semibold"
