@@ -1,5 +1,6 @@
 "use client";
 import { interviewer } from "@/constants";
+import { createFeedback } from "@/lib/actions/general.action";
 import { cn } from "@/lib/utils";
 import { vapi } from "@/lib/vapi.sdk";
 import Image from "next/image";
@@ -25,6 +26,7 @@ const Agent = ({
   type,
   interviewId,
   questions,
+  feedbackId,
 }: AgentProps) => {
   const router = useRouter();
   console.log(userName, userId, type);
@@ -140,10 +142,15 @@ const Agent = ({
   };
 
   const handleGenerateFeedback = async (messages: SavedMessage[]) => {
-    console.log("Generate Feedback Here");
+    console.log("Generate Feedback Here: ", { messages });
 
     // TODO: create a server action to generate feedback
-    const [success, id] = { success: true, id: "sdfdsds2435r3ewbsir3t" };
+    const { success, feedbackId: id } = await createFeedback({
+      interviewId: interviewId!,
+      userId: userId!,
+      transcript: messages,
+      feedbackId,
+    });
 
     if (success && id) {
       router.push(`/interview/${interviewId}/feedback`);
