@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import CustomButton from "@/components/CustomButton";
 import { getCurrentUser } from "@/lib/actions/auth.action";
 import {
   getFeedbackByInterviewId,
@@ -7,7 +7,6 @@ import {
 import { getTextColorOnFeedback } from "@/lib/utils";
 import dayjs from "dayjs";
 import Image from "next/image";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import React from "react";
 
@@ -131,16 +130,22 @@ const FeedBack = async ({ params }: RouteParams) => {
         </div>
       ) : null}
 
-      <div className="buttons">
-        <Button className="btn-secondary flex-1">
+      <div className="buttons flex flex-row gap-5 justify-center">
+        {/* <Button className="btn-secondary flex-1">
           <Link href="/" className="flex w-full justify-center">
             <p className="text-sm font-semibold text-primary-200 text-center">
               Back to dashboard
             </p>
           </Link>
-        </Button>
+        </Button> */}
+        <CustomButton linkHref="/" btnText="Back to dashboard" />
 
-        <Button className="btn-primary flex-1">
+        <CustomButton
+          linkHref={`/interview/${id}`}
+          btnText="Retake Interview"
+        />
+
+        {/* <Button className="btn-primary flex-1">
           <Link
             href={`/interview/${id}`}
             className="flex w-full justify-center"
@@ -149,7 +154,7 @@ const FeedBack = async ({ params }: RouteParams) => {
               Retake Interview
             </p>
           </Link>
-        </Button>
+        </Button> */}
       </div>
     </section>
   );

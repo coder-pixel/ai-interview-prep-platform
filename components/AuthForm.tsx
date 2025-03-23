@@ -7,7 +7,7 @@ import { z } from "zod";
 import { Form } from "@/components/ui/form";
 import { Button } from "./ui/button";
 import Image from "next/image";
-import { useMemo, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
 import FormField from "./FormField";
 import { useRouter } from "next/navigation";
@@ -31,6 +31,14 @@ const AuthForm = ({ type }: { type: FormType }) => {
   console.log({ type });
   const router = useRouter();
 
+  const [loading, setLoading] = useState({
+    submitLoading: false,
+  });
+
+  const _manageLoading = (key: string, value: boolean) => {
+    setLoading((prev) => ({ ...prev, [key]: value }));
+  };
+
   const [isLoading, startTransition] = useTransition();
 
   const formSchema = useMemo(() => AuthFormSchema(type), [type]);
@@ -47,9 +55,10 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
   // 2. Define a submit handler.
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-
     try {
+      console.log(values);
+
+      _manageLoading("submitLoading", true);
       if (type === "sign-up") {
         console.log("sign-up", { values });
         const { name, email, password } = values;
@@ -77,8 +86,10 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
         console.log("result", result);
 
-        toast.success("Account created successfully. Please Sign In");
-        router.push("/sign-in");
+        startTransition(() => {
+          toast.success("Account created successfully. Please Sign In");
+          router.push("/sign-in");
+        });
       } else {
         console.log("sign-in", { values });
 
@@ -100,12 +111,25 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
         await signIn({ email, idToken });
 
-        toast.success("Signed in successfully");
-        router.push("/");
+        startTransition(() => {
+          toast.success("Signed in successfully");
+          router.push("/");
+        });
       }
-    } catch (error) {
-      console.log(error);
-      toast.error(`There was an error: ${error}`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log({ error });
+      if (error?.code === "auth/invalid-credential") {
+        toast.error("Invalid credentials");
+      } else if (error?.code === "auth/user-not-found") {
+        toast.error("User not found");
+      } else if (error?.code === "auth/email-already-in-use") {
+        toast.error("Email already in use");
+      } else {
+        toast.error(`There was an error: ${error}`);
+      }
+    } finally {
+      _manageLoading("submitLoading", false);
     }
   };
 
@@ -151,8 +175,13 @@ const AuthForm = ({ type }: { type: FormType }) => {
               type="password"
             />
 
-            <Button className="btn " type="submit">
+            <Button
+              className="btn "
+              type="submit"
+              disabled={loading?.submitLoading || isLoading}
+            >
               {isSignIn ? "Sign In" : "Create An Account"}
+              {loading?.submitLoading || isLoading ? <CustomSpinner /> : null}
             </Button>
           </form>
         </Form>
@@ -162,7 +191,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
           <Button
             variant="link"
             className="font-bold text-user-primary ml-1 hover:underline hover:opacity-80 hover:font-semibold p-0 cursor-pointer"
-            disabled={isLoading}
+            disabled={isLoading || loading?.submitLoading}
             onClick={() => {
               startTransition(() => {
                 router.push(isSignIn ? "/sign-up" : "/sign-in");
@@ -170,7 +199,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
             }}
           >
             {!isSignIn ? "Sign In" : "Sign Up"}{" "}
-            {isLoading ? <CustomSpinner /> : null}
+            {isLoading && !loading?.submitLoading ? <CustomSpinner /> : null}
           </Button>
         </p>
       </div>

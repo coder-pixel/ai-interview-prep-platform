@@ -1,11 +1,10 @@
 import React from "react";
 import dayjs from "dayjs";
-import Link from "next/link";
 import Image from "next/image";
 import { cn, getRandomInterviewCover } from "@/lib/utils";
-import { Button } from "./ui/button";
 import DisplayTechIcons from "./DisplayTechIcons";
 import { getFeedbackByInterviewId } from "@/lib/actions/general.action";
+import CustomButton from "./CustomButton";
 
 const InterviewCard = async ({
   id,
@@ -35,7 +34,7 @@ InterviewCardProps) => {
 
   const formattedDate = dayjs(
     feedback?.createdAt || createdAt || Date.now()
-  ).format("MMM D, YYYY");
+  )?.format("MMM D, YYYY");
 
   //   const isFinalized = finalized || false;
 
@@ -92,13 +91,12 @@ InterviewCardProps) => {
         <div className="flex flex-row justify-between">
           <DisplayTechIcons techStack={techstack} />
 
-          <Button className="btn-primary">
-            <Link
-              href={feedback ? `/interview/${id}/feedback` : `/interview/${id}`}
-            >
-              {feedback ? "Check Feedback" : "View Interview"}
-            </Link>
-          </Button>
+          <CustomButton
+            linkHref={
+              feedback ? `/interview/${id}/feedback` : `/interview/${id}`
+            }
+            btnText={feedback ? "Check Feedback" : "View Interview"}
+          />
         </div>
       </div>
     </div>
