@@ -129,3 +129,14 @@ export const isAuthenticated = async () => {
 
   return !!user; // if user exists, return true, otherwise return false
 };
+
+// fn to logout
+export const signOut = async () => {
+  const cookieStore = await cookies();
+  cookieStore.delete("session");
+
+  return {
+    success: true,
+    message: "Signed out successfully",
+  };
+};
