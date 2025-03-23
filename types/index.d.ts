@@ -98,3 +98,10 @@ interface InterviewFormProps {
 interface TechIconProps {
   techStack: string[];
 }
+
+interface ProfileData {
+  name: string;
+  email: string;
+  phone?: string;
+  password?: string;
+}
