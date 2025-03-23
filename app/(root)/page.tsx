@@ -1,12 +1,11 @@
+import CustomButton from "@/components/CustomButton";
 import InterviewCard from "@/components/InterviewCard";
-import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/actions/auth.action";
 import {
   getInterviewsByUserId,
   getLatestInterviews,
 } from "@/lib/actions/general.action";
 import Image from "next/image";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import React from "react";
 
@@ -34,9 +33,11 @@ const Page = async () => {
             Practice real interview questions & get instant feedback
           </p>
 
-          <Button asChild className="btn-primary max-sm:w-full">
-            <Link href="/interview">Start an Interview</Link>
-          </Button>
+          <CustomButton
+            linkHref="/interview"
+            btnText="Generate Interview"
+            title="Generate A New Interview"
+          />
         </div>
 
         <Image

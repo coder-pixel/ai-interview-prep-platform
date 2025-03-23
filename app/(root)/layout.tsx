@@ -33,6 +33,7 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
             removeBtnClasses={true}
             dontShowSpinner={true}
             isLink={true}
+            title="Profile"
           />
         </div>
       </nav>

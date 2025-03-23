@@ -15,6 +15,7 @@ interface CustomButtonProps {
   variant?: "link" | "outline" | "ghost" | "default" | "destructive";
   dontShowSpinner?: boolean;
   isLink?: boolean;
+  title?: string;
 }
 
 const CustomButton = ({
@@ -26,6 +27,7 @@ const CustomButton = ({
   variant = "default",
   dontShowSpinner = false,
   isLink = false,
+  title = "",
 }: CustomButtonProps) => {
   const router = useRouter();
 
@@ -34,11 +36,12 @@ const CustomButton = ({
   return (
     <>
       {isLink ? (
-        <Link href={linkHref} className={className}>
+        <Link href={linkHref} className={className} title={title}>
           {btnText}
         </Link>
       ) : (
         <Button
+          title={title}
           className={`${
             removeBtnClasses ? "" : "btn-primary"
           } ${className} cursor-pointer`}

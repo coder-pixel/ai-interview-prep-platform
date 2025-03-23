@@ -5,8 +5,9 @@ import { cn } from "@/lib/utils";
 import { vapi } from "@/lib/vapi.sdk";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
+import CustomSpinner from "./CustomSpinner";
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -34,6 +35,9 @@ const Agent = ({
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
   const [messages, setMessages] = useState<SavedMessage[]>([]);
+
+  const [isCallStartLoading, isCallStartTransition] = useTransition();
+  const [isCallEndLoading, isCallEndTransition] = useTransition();
 
   const latestMessage = messages[messages?.length - 1]?.content; // get the last message of the conversation, so that we can display it as a transcript to the user
 
@@ -213,24 +217,50 @@ const Agent = ({
       {/* btn to start/end call */}
       <div className="w-full flex justify-center">
         {callStatus !== "ACTIVE" ? (
-          <button className="relative btn-call" onClick={handleCall}>
-            <span
-              className={cn(
-                "absolute animate-ping rounded-full opacity-75",
-                callStatus !== "CONNECTING" && "hidden"
-              )}
-            />
+          <>
+            <button
+              className="relative btn-call"
+              onClick={() => {
+                isCallStartTransition(() => handleCall());
+              }}
+              disabled={isCallStartLoading}
+            >
+              <span
+                className={cn(
+                  "absolute animate-ping rounded-full opacity-75",
+                  callStatus !== "CONNECTING" && "hidden"
+                )}
+              />
 
-            <span className="relative">
-              {isCallInactiveOrFinished ? "Call" : ". . ."}
-            </span>
-          </button>
+              <span className="relative flex items-center gap-2 justify-center flex-row">
+                {isCallInactiveOrFinished && !isCallStartLoading
+                  ? "Call"
+                  : ". . ."}{" "}
+              </span>
+            </button>
+
+            {/* btn to end call to show when call is being generated */}
+            {/* {callStatus === "CONNECTING" ||
+              (isCallStartLoading && (
+                <button
+                  className="btn-disconnect cursor-pointer"
+                  onClick={handleDisconnect}
+                  disabled={isCallEndLoading}
+                >
+                  End {isCallEndLoading && <CustomSpinner />}
+                </button>
+              ))} */}
+          </>
         ) : (
           <button
-            className="btn-disconnect cursor-pointer"
-            onClick={handleDisconnect}
+            className="btn-disconnect cursor-pointer flex justify-center items-center"
+            onClick={() => {
+              isCallEndTransition(() => handleDisconnect());
+            }}
+            disabled={isCallEndLoading}
           >
-            End
+            <span className="mr-2">End </span>{" "}
+            {isCallEndLoading && <CustomSpinner />}
           </button>
         )}
       </div>
