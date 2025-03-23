@@ -7,8 +7,7 @@ import { z } from "zod";
 import { Form } from "@/components/ui/form";
 import { Button } from "./ui/button";
 import Image from "next/image";
-import { useMemo } from "react";
-import Link from "next/link";
+import { useMemo, useTransition } from "react";
 import { toast } from "sonner";
 import FormField from "./FormField";
 import { useRouter } from "next/navigation";
@@ -18,6 +17,7 @@ import {
 } from "firebase/auth";
 import { auth } from "@/firebase/client";
 import { signIn, signUp } from "@/lib/actions/auth.action";
+import CustomSpinner from "./CustomSpinner";
 
 const AuthFormSchema = (type: FormType) => {
   return z.object({
@@ -30,6 +30,8 @@ const AuthFormSchema = (type: FormType) => {
 const AuthForm = ({ type }: { type: FormType }) => {
   console.log({ type });
   const router = useRouter();
+
+  const [isLoading, startTransition] = useTransition();
 
   const formSchema = useMemo(() => AuthFormSchema(type), [type]);
 
@@ -157,12 +159,19 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
         <p className="text-center">
           {isSignIn ? "Don't have an account?" : "Already have an account?"}
-          <Link
-            href={isSignIn ? "/sign-up" : "/sign-in"}
-            className="font-bold text-user-primary ml-1 hover:underline hover:opacity-80 hover:font-semibold"
+          <Button
+            variant="link"
+            className="font-bold text-user-primary ml-1 hover:underline hover:opacity-80 hover:font-semibold p-0 cursor-pointer"
+            disabled={isLoading}
+            onClick={() => {
+              startTransition(() => {
+                router.push(isSignIn ? "/sign-up" : "/sign-in");
+              });
+            }}
           >
-            {!isSignIn ? "Sign In" : "Sign Up"}
-          </Link>
+            {!isSignIn ? "Sign In" : "Sign Up"}{" "}
+            {isLoading ? <CustomSpinner /> : null}
+          </Button>
         </p>
       </div>
     </div>
