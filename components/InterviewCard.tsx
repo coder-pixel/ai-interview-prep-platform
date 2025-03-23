@@ -95,7 +95,7 @@ InterviewCardProps) => {
             linkHref={
               feedback ? `/interview/${id}/feedback` : `/interview/${id}`
             }
-            btnText={feedback ? "Check Feedback" : "View Interview"}
+            btnText={feedback ? "Check Feedback" : "Take Interview"}
           />
         </div>
       </div>
