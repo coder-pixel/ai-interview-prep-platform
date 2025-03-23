@@ -5,17 +5,24 @@ import Image from "next/image";
 import { cn, getRandomInterviewCover } from "@/lib/utils";
 import { Button } from "./ui/button";
 import DisplayTechIcons from "./DisplayTechIcons";
+import { getFeedbackByInterviewId } from "@/lib/actions/general.action";
 
-const InterviewCard = ({
+const InterviewCard = async ({
   id,
-  //   userId,
+  userId,
   role,
   type,
   techstack,
   createdAt,
 }: //   finalized,
 InterviewCardProps) => {
-  const feedback = null as Feedback | null;
+  const feedback =
+    userId && id
+      ? await getFeedbackByInterviewId({
+          interviewId: id,
+          userId: userId,
+        })
+      : null;
 
   const normalizedType = /mix/gi?.test(type) ? "Mixed" : type;
 
