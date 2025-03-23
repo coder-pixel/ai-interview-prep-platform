@@ -45,3 +45,16 @@ export const getRandomInterviewCover = () => {
   const randomIndex = Math.floor(Math.random() * interviewCovers?.length);
   return `/covers${interviewCovers?.[randomIndex]}`;
 };
+
+export const getTextColorOnFeedback = (score: number) => {
+  if (!score) return "";
+
+  switch (true) {
+    case score >= 80:
+      return "text-green-500";
+    case score >= 50:
+      return "text-yellow-500";
+    default:
+      return "text-red-500";
+  }
+};
