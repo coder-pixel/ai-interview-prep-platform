@@ -45,7 +45,7 @@ export const LogoutBtn = () => {
 
   return (
     <Button
-      variant="outline"
+      variant="link"
       size="icon"
       title="Logout"
       className="cursor-pointer"
@@ -58,8 +58,8 @@ export const LogoutBtn = () => {
         <Image
           src="/logout-svgrepo-com.svg"
           alt="Logout Logo"
-          width={20}
-          height={20}
+          width={30}
+          height={30}
         />
       )}
     </Button>

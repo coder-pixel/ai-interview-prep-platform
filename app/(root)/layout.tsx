@@ -4,6 +4,7 @@ import Image from "next/image";
 import { isAuthenticated } from "@/lib/actions/auth.action";
 import { redirect } from "next/navigation";
 import { LogoutBtn } from "@/components/LogoutBtn";
+import CustomButton from "@/components/CustomButton";
 
 const RootLayout = async ({ children }: { children: ReactNode }) => {
   const isUserAuthenticated = await isAuthenticated();
@@ -20,7 +21,20 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
           <h2 className="text-primary-100">InterviewPrep</h2>
         </Link>
 
-        <LogoutBtn />
+        <div className="flex items-center gap-2">
+          <LogoutBtn />
+
+          <CustomButton
+            linkHref="/profile"
+            className="p-0"
+            btnText={
+              <Image src="/profile.svg" alt="Profile" width={30} height={30} />
+            }
+            removeBtnClasses={true}
+            dontShowSpinner={true}
+            isLink={true}
+          />
+        </div>
       </nav>
       {children}
     </div>
