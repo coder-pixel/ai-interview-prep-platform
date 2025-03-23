@@ -35,7 +35,7 @@ const CustomButton = ({
     <>
       {isLink ? (
         <Link href={linkHref} className={className}>
-          {btnText} qy
+          {btnText}
         </Link>
       ) : (
         <Button
